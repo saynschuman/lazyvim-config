@@ -112,9 +112,15 @@ end, { desc = "🔁 Переключиться на выбранную ветк�
 
 -- Ctrl-b: показать список всех веток и скопировать выбранную
 vim.keymap.set("n", "<C-b>", function()
-  local ok, builtin = pcall(require, "telescope.builtin")
-  if not ok then
+  local ok_telescope = pcall(require, "telescope")
+  if not ok_telescope then
     vim.notify("❌ Telescope not found", vim.log.levels.ERROR)
+    return
+  end
+
+  local ok_builtin, builtin = pcall(require, "telescope.builtin")
+  if not ok_builtin then
+    vim.notify("❌ telescope.builtin not found", vim.log.levels.ERROR)
     return
   end
 
