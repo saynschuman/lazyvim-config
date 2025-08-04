@@ -34,3 +34,35 @@ map("n", "<leader>ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять
 
 -- 🛠️ Настройка визуала diff-окон (не hotkey, но полезно)
 vim.opt.fillchars:append({ diff = " " }) -- диагональные полосы вместо пустых строк
+
+-- Compare
+
+vim.keymap.set("n", "<leader>gb", function()
+  -- Получаем список всех локальных и удалённых веток
+  local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
+
+  -- Убираем текущую HEAD, origin/HEAD и сортируем
+  local clean = {}
+  for _, b in ipairs(branches) do
+    if not b:match("HEAD") then
+      table.insert(clean, b)
+    end
+  end
+  table.sort(clean)
+
+  -- Получаем текущую ветку
+  local current = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+
+  -- Выбор ветки
+  vim.ui.select(clean, {
+    prompt = "Сравнить с веткой:",
+  }, function(choice)
+    if not choice or choice == current then
+      print("Ветка не выбрана или совпадает с текущей")
+      return
+    end
+    -- Команда для сравнения
+    local cmd = string.format("DiffviewOpen %s...%s", choice, current)
+    vim.cmd(cmd)
+  end)
+end, { desc = "🔀 Diff с выбранной веткой" })
