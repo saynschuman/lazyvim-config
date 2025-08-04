@@ -1,18 +1,18 @@
 return {
   "stevearc/conform.nvim",
-  opts = function(_, opts)
-    opts.format_on_save = function(bufnr)
-      if vim.bo[bufnr].filetype == "php" then
-        return false
-      end
-      return { timeout_ms = 500, lsp_fallback = true }
-    end
+  init = function()
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "php",
+      callback = function()
+        vim.b.autoformat = false
+      end,
+    })
   end,
   keys = {
     {
       "<leader>cp",
       function()
-        require("conform").format({ async = true, lsp_fallback = true })
+        require("conform").format({ async = true, lsp_fallback = true, formatters = { "prettier" } })
       end,
       desc = "Format with Prettier",
     },
