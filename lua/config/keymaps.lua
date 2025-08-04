@@ -81,15 +81,31 @@ vim.keymap.set("n", "<leader>gb", function()
   table.sort(clean)
 
   vim.ui.select(clean, { prompt = "Переключиться на ветку:" }, function(choice)
-    if choice then
-      local output = vim.fn.system("git checkout " .. choice)
-      if vim.v.shell_error == 0 then
-        vim.notify("✅ Переключено на ветку: " .. choice, vim.log.levels.INFO)
+    if not choice then
+      vim.notify("Переключение отменено", vim.log.levels.INFO)
+      return
+    end
+
+    -- Проверяем, существует ли локальная ветка
+    vim.fn.system("git show-ref --verify --quiet refs/heads/" .. choice)
+    local output
+    if vim.v.shell_error ~= 0 then
+      -- Попытка переключиться на удалённую ветку
+      local remote, branch = choice:match("^([^/]+)/(.+)$")
+      if remote and branch then
+        output = vim.fn.system(string.format("git checkout -b %s %s/%s", branch, remote, branch))
+        choice = branch
       else
-        vim.notify("❌ Ошибка переключения:\n" .. output, vim.log.levels.ERROR)
+        output = vim.fn.system("git checkout " .. choice)
       end
     else
-      vim.notify("Переключение отменено", vim.log.levels.INFO)
+      output = vim.fn.system("git checkout " .. choice)
+    end
+
+    if vim.v.shell_error == 0 then
+      vim.notify("✅ Переключено на ветку: " .. choice, vim.log.levels.INFO)
+    else
+      vim.notify("❌ Ошибка переключения:\n" .. output, vim.log.levels.ERROR)
     end
   end)
 end, { desc = "🔁 Переключиться на выбранную ветку" })
