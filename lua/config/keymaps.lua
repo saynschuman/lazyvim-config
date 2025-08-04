@@ -110,42 +110,29 @@ vim.keymap.set("n", "<leader>gb", function()
   end)
 end, { desc = "🔁 Переключиться на выбранную ветку" })
 
--- Ctrl-b: показать список всех веток и скопировать выбранную
 vim.keymap.set("n", "<C-b>", function()
-  local ok_telescope = pcall(require, "telescope")
-  if not ok_telescope then
-    vim.notify("❌ Telescope not found", vim.log.levels.ERROR)
+  local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
+  if vim.v.shell_error ~= 0 or vim.tbl_isempty(branches) then
+    vim.notify("❌ Не удалось получить список веток", vim.log.levels.ERROR)
     return
   end
 
-  local ok_builtin, builtin = pcall(require, "telescope.builtin")
-  if not ok_builtin then
-    vim.notify("❌ telescope.builtin not found", vim.log.levels.ERROR)
-    return
+  local clean = {}
+  for _, b in ipairs(branches) do
+    b = b:gsub("^%*%s+", "")
+    if not b:match("HEAD") and b ~= "" then
+      table.insert(clean, b)
+    end
   end
 
-  builtin.git_branches({
-    attach_mappings = function(prompt_bufnr, map)
-      local ok_actions, actions = pcall(require, "telescope.actions")
-      local ok_state, state = pcall(require, "telescope.actions.state")
-      if not (ok_actions and ok_state) then
-        vim.notify("❌ Telescope actions not found", vim.log.levels.ERROR)
-        return false
-      end
+  table.sort(clean)
 
-      local function yank_branch()
-        local selection = state.get_selected_entry()
-        if selection then
-          local branch = selection.value
-          vim.fn.setreg("+", branch)
-          vim.notify("📋 Ветка скопирована: " .. branch, vim.log.levels.INFO)
-        end
-        actions.close(prompt_bufnr)
-      end
-
-      map("i", "y", yank_branch)
-      map("n", "y", yank_branch)
-      return true
-    end,
-  })
+  vim.ui.select(clean, { prompt = "Скопировать ветку:" }, function(choice)
+    if choice then
+      vim.fn.setreg("+", choice)
+      vim.notify("📋 Ветка скопирована: " .. choice, vim.log.levels.INFO)
+    else
+      vim.notify("Операция отменена", vim.log.levels.INFO)
+    end
+  end)
 end, { desc = "🌿 Показать ветки" })
