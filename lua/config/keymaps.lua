@@ -136,3 +136,20 @@ vim.keymap.set("n", "<C-b>", function()
     end
   end)
 end, { desc = "🌿 Показать ветки" })
+
+vim.keymap.set("n", "<C-y>", function()
+  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD")
+  if vim.v.shell_error ~= 0 then
+    vim.notify("❌ Не удалось получить текущую ветку", vim.log.levels.ERROR)
+    return
+  end
+
+  branch = branch:gsub("%s+", "")
+  if branch == "" then
+    vim.notify("❌ Не удалось получить текущую ветку", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.fn.setreg("+", branch)
+  vim.notify("📋 Текущая ветка скопирована: " .. branch, vim.log.levels.INFO)
+end, { desc = "🌿 Скопировать текущую ветку" })
