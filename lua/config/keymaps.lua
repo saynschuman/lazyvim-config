@@ -109,3 +109,27 @@ vim.keymap.set("n", "<leader>gb", function()
     end
   end)
 end, { desc = "🔁 Переключиться на выбранную ветку" })
+
+-- Ctrl-b: показать список всех веток и скопировать выбранную
+vim.keymap.set("n", "<C-b>", function()
+  require("telescope.builtin").git_branches({
+    attach_mappings = function(prompt_bufnr, map)
+      local actions = require("telescope.actions")
+      local state = require("telescope.actions.state")
+
+      local function yank_branch()
+        local selection = state.get_selected_entry()
+        if selection then
+          local branch = selection.value
+          vim.fn.setreg("+", branch)
+          vim.notify("📋 Ветка скопирована: " .. branch, vim.log.levels.INFO)
+        end
+        actions.close(prompt_bufnr)
+      end
+
+      map("i", "y", yank_branch)
+      map("n", "y", yank_branch)
+      return true
+    end,
+  })
+end, { desc = "🌿 Показать ветки" })
