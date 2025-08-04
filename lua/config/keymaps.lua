@@ -37,7 +37,7 @@ vim.opt.fillchars:append({ diff = " " }) -- диагональные полос�
 
 -- Compare
 
-vim.keymap.set("n", "<leader>gb", function()
+vim.keymap.set("n", "<leader>gc", function()
   -- Получаем список всех локальных и удалённых веток
   local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
 
@@ -66,3 +66,30 @@ vim.keymap.set("n", "<leader>gb", function()
     vim.cmd(cmd)
   end)
 end, { desc = "🔀 Diff с выбранной веткой" })
+
+-- Горячая клавиша <leader>gb: переключение на выбранную ветку
+vim.keymap.set("n", "<leader>gb", function()
+  local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
+
+  local clean = {}
+  for _, b in ipairs(branches) do
+    if not b:match("HEAD") then
+      table.insert(clean, b)
+    end
+  end
+
+  table.sort(clean)
+
+  vim.ui.select(clean, { prompt = "Переключиться на ветку:" }, function(choice)
+    if choice then
+      local output = vim.fn.system("git checkout " .. choice)
+      if vim.v.shell_error == 0 then
+        vim.notify("✅ Переключено на ветку: " .. choice, vim.log.levels.INFO)
+      else
+        vim.notify("❌ Ошибка переключения:\n" .. output, vim.log.levels.ERROR)
+      end
+    else
+      vim.notify("Переключение отменено", vim.log.levels.INFO)
+    end
+  end)
+end, { desc = "🔁 Переключиться на выбранную ветку" })
