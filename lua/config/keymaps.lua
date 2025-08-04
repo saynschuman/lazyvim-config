@@ -112,10 +112,20 @@ end, { desc = "🔁 Переключиться на выбранную ветк�
 
 -- Ctrl-b: показать список всех веток и скопировать выбранную
 vim.keymap.set("n", "<C-b>", function()
-  require("telescope.builtin").git_branches({
+  local ok, builtin = pcall(require, "telescope.builtin")
+  if not ok then
+    vim.notify("❌ Telescope not found", vim.log.levels.ERROR)
+    return
+  end
+
+  builtin.git_branches({
     attach_mappings = function(prompt_bufnr, map)
-      local actions = require("telescope.actions")
-      local state = require("telescope.actions.state")
+      local ok_actions, actions = pcall(require, "telescope.actions")
+      local ok_state, state = pcall(require, "telescope.actions.state")
+      if not (ok_actions and ok_state) then
+        vim.notify("❌ Telescope actions not found", vim.log.levels.ERROR)
+        return false
+      end
 
       local function yank_branch()
         local selection = state.get_selected_entry()
