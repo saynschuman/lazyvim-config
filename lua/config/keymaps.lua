@@ -109,3 +109,47 @@ vim.keymap.set("n", "<leader>gb", function()
     end
   end)
 end, { desc = "🔁 Переключиться на выбранную ветку" })
+
+vim.keymap.set("n", "<C-b>", function()
+  local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
+  if vim.v.shell_error ~= 0 or vim.tbl_isempty(branches) then
+    vim.notify("❌ Не удалось получить список веток", vim.log.levels.ERROR)
+    return
+  end
+
+  local clean = {}
+  for _, b in ipairs(branches) do
+    b = b:gsub("^%*%s+", "")
+    if not b:match("HEAD") and b ~= "" then
+      table.insert(clean, b)
+    end
+  end
+
+  table.sort(clean)
+
+  vim.ui.select(clean, { prompt = "Скопировать ветку:" }, function(choice)
+    if choice then
+      vim.fn.setreg("+", choice)
+      vim.notify("📋 Ветка скопирована: " .. choice, vim.log.levels.INFO)
+    else
+      vim.notify("Операция отменена", vim.log.levels.INFO)
+    end
+  end)
+end, { desc = "🌿 Показать ветки" })
+
+vim.keymap.set("n", "<C-y>", function()
+  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD")
+  if vim.v.shell_error ~= 0 then
+    vim.notify("❌ Не удалось получить текущую ветку", vim.log.levels.ERROR)
+    return
+  end
+
+  branch = branch:gsub("%s+", "")
+  if branch == "" then
+    vim.notify("❌ Не удалось получить текущую ветку", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.fn.setreg("+", branch)
+  vim.notify("📋 Текущая ветка скопирована: " .. branch, vim.log.levels.INFO)
+end, { desc = "🌿 Скопировать текущую ветку" })
