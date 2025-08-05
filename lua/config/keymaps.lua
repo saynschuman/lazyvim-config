@@ -35,6 +35,43 @@ map("n", "<leader>ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять
 -- 🛠️ Настройка визуала diff-окон (не hotkey, но полезно)
 vim.opt.fillchars:append({ diff = " " }) -- диагональные полосы вместо пустых строк
 
+-- 🔄 Обновить репозиторий
+vim.keymap.set("n", "<leader>gU", function()
+  local fetch_output = vim.fn.systemlist("git fetch 2>&1")
+  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+  local pull_output = vim.fn.systemlist("git pull origin " .. branch .. " 2>&1")
+  local changed_files = vim.fn.systemlist("git diff --name-status HEAD@{1} 2>&1")
+
+  local lines = { "git fetch:" }
+  vim.list_extend(lines, fetch_output)
+  table.insert(lines, "")
+  table.insert(lines, "git pull:")
+  vim.list_extend(lines, pull_output)
+  if #changed_files > 0 then
+    table.insert(lines, "")
+    table.insert(lines, "Changed files:")
+    vim.list_extend(lines, changed_files)
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.min(#lines + 2, math.floor(vim.o.lines * 0.8))
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+  vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  })
+  vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
+  vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
+end, { desc = "🔄 Fetch & Pull" })
+
 -- Compare
 
 vim.keymap.set("n", "<leader>gc", function()
