@@ -5,12 +5,13 @@ return {
     hooks = {
       -- Открытие diff по одному коммиту
       on_select_commit = function(commit)
-        vim.notify("DiffviewOpen " .. commit.hash .. "^!")
         vim.cmd("DiffviewOpen " .. commit.hash .. "^!")
+        vim.schedule(function()
+          vim.bo.modified = false
+        end)
       end,
       -- Дифф между двумя коммитами
       on_select_range_commit = function(from, to)
-        vim.notify("DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
         vim.cmd("DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
       end,
     },
