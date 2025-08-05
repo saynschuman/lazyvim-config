@@ -5,6 +5,63 @@
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
+local function create_popup(lines)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.min(#lines + 2, math.floor(vim.o.lines * 0.8))
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+  vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  })
+  vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
+  vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
+  return buf
+end
+
+local function start_spinner(buf, line)
+  local frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+  local idx = 1
+  local timer = vim.loop.new_timer()
+  timer:start(
+    0,
+    100,
+    vim.schedule_wrap(function()
+      if not vim.api.nvim_buf_is_valid(buf) then
+        timer:stop()
+        timer:close()
+        return
+      end
+      vim.api.nvim_buf_set_lines(buf, line, line + 1, false, { "Loading " .. frames[idx] })
+      idx = (idx % #frames) + 1
+    end)
+  )
+  return {
+    stop = function()
+      timer:stop()
+      timer:close()
+      if vim.api.nvim_buf_is_valid(buf) then
+        vim.api.nvim_buf_set_lines(buf, line, line + 1, false, { "" })
+      end
+    end,
+  }
+end
+
+local function collect_output(tbl, data)
+  for _, s in ipairs(data) do
+    if s ~= "" then
+      table.insert(tbl, s)
+    end
+  end
+end
+
 -- 🔍 Основные команды
 map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>", { desc = "📂 Diff всего проекта" })
 map("n", "<leader>gD", "<cmd>DiffviewOpen HEAD~1<CR>", { desc = "📂 Diff с предыдущим коммитом" })
@@ -34,6 +91,81 @@ map("n", "<leader>ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять
 
 -- 🛠️ Настройка визуала diff-окон (не hotkey, но полезно)
 vim.opt.fillchars:append({ diff = " " }) -- диагональные полосы вместо пустых строк
+
+vim.keymap.set("n", "<leader>gU", function()
+  local buf = create_popup({ "git fetch & pull", "", "" })
+  local spin = start_spinner(buf, 2)
+  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+  local fetch_output, pull_output = {}, {}
+
+  vim.fn.jobstart({ "git", "fetch" }, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      collect_output(fetch_output, data)
+    end,
+    on_stderr = function(_, data)
+      collect_output(fetch_output, data)
+    end,
+    on_exit = function()
+      vim.fn.jobstart({ "git", "pull", "origin", branch }, {
+        stdout_buffered = true,
+        stderr_buffered = true,
+        on_stdout = function(_, data)
+          collect_output(pull_output, data)
+        end,
+        on_stderr = function(_, data)
+          collect_output(pull_output, data)
+        end,
+        on_exit = function()
+          spin.stop()
+          local changed_files = vim.fn.systemlist("git diff --name-status HEAD@{1} 2>&1")
+          local lines = { "git fetch:" }
+          vim.list_extend(lines, fetch_output)
+          table.insert(lines, "")
+          table.insert(lines, "git pull:")
+          vim.list_extend(lines, pull_output)
+          if #changed_files > 0 then
+            table.insert(lines, "")
+            table.insert(lines, "Changed files:")
+            vim.list_extend(lines, changed_files)
+          end
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+        end,
+      })
+    end,
+  })
+end, { desc = "🔄 Fetch & Pull" })
+
+vim.keymap.set("n", "<leader>gP", function()
+  local buf = create_popup({ "git push", "", "" })
+  local spin = start_spinner(buf, 2)
+  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+  vim.fn.system("git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>&1")
+  local cmd
+  if vim.v.shell_error ~= 0 then
+    cmd = { "git", "push", "-u", "origin", branch }
+  else
+    cmd = { "git", "push" }
+  end
+  local push_output = {}
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      collect_output(push_output, data)
+    end,
+    on_stderr = function(_, data)
+      collect_output(push_output, data)
+    end,
+    on_exit = function()
+      spin.stop()
+      local lines = { "git push:" }
+      vim.list_extend(lines, push_output)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    end,
+  })
+end, { desc = "⤴️ Push current branch" })
 
 -- Compare
 
