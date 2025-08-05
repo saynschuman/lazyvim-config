@@ -15,6 +15,10 @@ return {
         vim.cmd("DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
       end,
     },
+    symbols = {
+      merge_commit = '●',
+      commit = '○',
+    },
   },
   keys = {
     {
