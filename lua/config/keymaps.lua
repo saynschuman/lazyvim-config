@@ -153,3 +153,20 @@ vim.keymap.set("n", "<C-y>", function()
   vim.fn.setreg("+", branch)
   vim.notify("📋 Текущая ветка скопирована: " .. branch, vim.log.levels.INFO)
 end, { desc = "🌿 Скопировать текущую ветку" })
+
+
+vim.api.nvim_create_user_command("SmartBranch", function()
+  local input = vim.fn.input("Branch name (new or existing): ")
+  if input == "" then return end
+
+  local branches = vim.fn.systemlist("git branch --list " .. input)
+  if #branches == 0 then
+    vim.fn.system({ "git", "checkout", "-b", input })
+    print("Created and switched to new branch:", input)
+  else
+    vim.fn.system({ "git", "checkout", input })
+    print("Switched to existing branch:", input)
+  end
+end, {})
+
+vim.keymap.set("n", "<leader>gn", "<cmd>SmartBranch<cr>", { desc = "Smart Branch (Create/Switch)" })
