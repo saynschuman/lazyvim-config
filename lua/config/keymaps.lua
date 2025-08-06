@@ -302,3 +302,4 @@ vim.api.nvim_create_user_command("SmartBranch", function()
 end, {})
 
 vim.keymap.set("n", "<leader>gn", "<cmd>SmartBranch<cr>", { desc = "Smart Branch (Create/Switch)" })
+vim.keymap.set("n", "<leader>ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorizer Attach" })
