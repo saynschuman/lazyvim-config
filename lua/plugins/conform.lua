@@ -2,7 +2,7 @@ return {
   "stevearc/conform.nvim",
   init = function()
     vim.api.nvim_create_autocmd("FileType", {
-      pattern = "php",
+      pattern = { "php", "typescript", "typescriptreact", "javascript" },
       callback = function()
         vim.b.autoformat = false
       end,
