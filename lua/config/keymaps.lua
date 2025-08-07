@@ -12,7 +12,7 @@ local function create_popup(lines)
   local height = math.min(#lines + 2, math.floor(vim.o.lines * 0.8))
   local row = math.floor((vim.o.lines - height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
-  vim.api.nvim_open_win(buf, true, {
+  local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     width = width,
     height = height,
@@ -23,7 +23,7 @@ local function create_popup(lines)
   })
   vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
   vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
-  return buf
+  return buf, win
 end
 
 local function start_spinner(buf, line)
@@ -93,7 +93,7 @@ map("n", "<leader>ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять
 vim.opt.fillchars:append({ diff = " " }) -- диагональные полосы вместо пустых строк
 
 vim.keymap.set("n", "<leader>gU", function()
-  local buf = create_popup({ "git fetch & pull", "", "" })
+  local buf, win = create_popup({ "git fetch & pull", "", "" })
   local spin = start_spinner(buf, 2)
   local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
   local fetch_output, pull_output = {}, {}
@@ -131,6 +131,10 @@ vim.keymap.set("n", "<leader>gU", function()
             vim.list_extend(lines, changed_files)
           end
           vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+          local cfg = vim.api.nvim_win_get_config(win)
+          cfg.height = math.min(#lines + 2, math.floor(vim.o.lines * 0.8))
+          cfg.row = math.floor((vim.o.lines - cfg.height) / 2)
+          vim.api.nvim_win_set_config(win, cfg)
         end,
       })
     end,
