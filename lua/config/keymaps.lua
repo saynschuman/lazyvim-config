@@ -65,34 +65,54 @@ end
 -- 🔍 Основные команды
 map("n", "<leader>gd", "<cmd>DiffviewOpen<CR>", { desc = "📂 Diff всего проекта" })
 map("n", "<leader>gD", "<cmd>DiffviewOpen HEAD~1<CR>", { desc = "📂 Diff с предыдущим коммитом" })
-map("n", "<leader>gq", "<cmd>DiffviewClose<CR>", { desc = "❌ Закрыть Diffview" })
+map("n", "gq", "<cmd>DiffviewClose<CR>", { desc = "❌ Закрыть Diffview" })
 
 -- 🕓 История
-map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", { desc = "🕘 История текущего файла" })
-map("n", "<leader>gH", "<cmd>DiffviewFileHistory<CR>", { desc = "🕘 История проекта" })
+map("n", "gh", "<cmd>DiffviewFileHistory %<CR>", { desc = "🕘 История текущего файла" })
+map("n", "gH", "<cmd>DiffviewFileHistory<CR>", { desc = "🕘 История проекта" })
 
 -- 🧭 Панель файлов
 map(
   "n",
-  "<leader>gt",
+  "gt",
   "<cmd>DiffviewToggleFiles<CR>",
   { desc = "📁 Показать/скрыть панель файлов" }
 )
-map("n", "<leader>gf", "<cmd>DiffviewFocusFiles<CR>", { desc = "🔎 Фокус на панель файлов" })
-map("n", "<leader>gr", "<cmd>DiffviewRefresh<CR>", { desc = "🔄 Обновить Diffview" })
+map("n", "gf", "<cmd>DiffviewFocusFiles<CR>", { desc = "🔎 Фокус на панель файлов" })
+vim.keymap.set("n", "<leader>gr", function()
+  local buf = create_popup({ "git reset --hard HEAD", "", "" })
+  local spin = start_spinner(buf, 2)
+  local reset_output = {}
+  vim.fn.jobstart({ "git", "reset", "--hard", "HEAD" }, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      collect_output(reset_output, data)
+    end,
+    on_stderr = function(_, data)
+      collect_output(reset_output, data)
+    end,
+    on_exit = function()
+      spin.stop()
+      local lines = { "git reset --hard HEAD:" }
+      vim.list_extend(lines, reset_output)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    end,
+  })
+end, { desc = "♻️ Сбросить все изменения" })
 
 -- 📑 Навигация по изменениям
 map("n", "]c", "]c", { desc = "➡ Следующий hunk (diff)" })
 map("n", "[c", "[c", { desc = "⬅ Предыдущий hunk (diff)" })
 
 -- 🧩 Для конфликтов/мержа (внутри merge view)
-map("n", "<leader>ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять изменения (toggle panel)" })
+map("n", "ga", ":DiffviewToggleFiles<CR>", { desc = "🧩 Принять изменения (toggle panel)" })
 -- Маппинги типа `:DiffviewFileHistory HEAD~3 -- path` можно добавлять вручную, если хочешь
 
 -- 🛠️ Настройка визуала diff-окон (не hotkey, но полезно)
 vim.opt.fillchars:append({ diff = " " }) -- диагональные полосы вместо пустых строк
 
-vim.keymap.set("n", "<leader>gU", function()
+vim.keymap.set("n", "gU", function()
   local buf, win = create_popup({ "git fetch & pull", "", "" })
   local spin = start_spinner(buf, 2)
   local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
@@ -141,7 +161,7 @@ vim.keymap.set("n", "<leader>gU", function()
   })
 end, { desc = "🔄 Fetch & Pull" })
 
-vim.keymap.set("n", "<leader>gP", function()
+vim.keymap.set("n", "gP", function()
   local buf = create_popup({ "git push", "", "" })
   local spin = start_spinner(buf, 2)
   local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
@@ -173,7 +193,7 @@ end, { desc = "⤴️ Push current branch" })
 
 -- Compare
 
-vim.keymap.set("n", "<leader>gc", function()
+vim.keymap.set("n", "gc", function()
   -- Получаем список всех локальных и удалённых веток
   local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
 
@@ -203,8 +223,8 @@ vim.keymap.set("n", "<leader>gc", function()
   end)
 end, { desc = "🔀 Diff с выбранной веткой" })
 
--- Горячая клавиша <leader>gb: переключение на выбранную ветку
-vim.keymap.set("n", "<leader>gb", function()
+-- Горячая клавиша gb: переключение на выбранную ветку
+vim.keymap.set("n", "gb", function()
   local branches = vim.fn.systemlist("git branch --all --format='%(refname:short)'")
 
   local clean = {}
@@ -273,7 +293,7 @@ vim.keymap.set("n", "<C-b>", function()
   end)
 end, { desc = "🌿 Показать ветки" })
 
-vim.keymap.set("n", "<C-y>", function()
+vim.keymap.set("n", "<leader>y", function()
   local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD")
   if vim.v.shell_error ~= 0 then
     vim.notify("❌ Не удалось получить текущую ветку", vim.log.levels.ERROR)
@@ -305,5 +325,5 @@ vim.api.nvim_create_user_command("SmartBranch", function()
   end
 end, {})
 
-vim.keymap.set("n", "<leader>gn", "<cmd>SmartBranch<cr>", { desc = "Smart Branch (Create/Switch)" })
-vim.keymap.set("n", "<leader>ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorizer Attach" })
+vim.keymap.set("n", "gn", "<cmd>SmartBranch<cr>", { desc = "Smart Branch (Create/Switch)" })
+vim.keymap.set("n", "ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorizer Attach" })
