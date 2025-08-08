@@ -80,6 +80,9 @@ map(
 )
 map("n", "gf", "<cmd>DiffviewFocusFiles<CR>", { desc = "🔎 Фокус на панель файлов" })
 vim.keymap.set("n", "<leader>gr", function()
+  if vim.fn.confirm("Сбросить все изменения?", "&Yes\n&No", 2) ~= 1 then
+    return
+  end
   local buf = create_popup({ "git reset --hard HEAD", "", "" })
   local spin = start_spinner(buf, 2)
   local reset_output = {}
@@ -100,6 +103,28 @@ vim.keymap.set("n", "<leader>gr", function()
     end,
   })
 end, { desc = "♻️ Сбросить все изменения" })
+
+vim.keymap.set("n", "<leader>ga", function()
+  local buf = create_popup({ "git add .", "", "" })
+  local spin = start_spinner(buf, 2)
+  local add_output = {}
+  vim.fn.jobstart({ "git", "add", "." }, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      collect_output(add_output, data)
+    end,
+    on_stderr = function(_, data)
+      collect_output(add_output, data)
+    end,
+    on_exit = function()
+      spin.stop()
+      local lines = { "git add .:" }
+      vim.list_extend(lines, add_output)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    end,
+  })
+end, { desc = "➕ Добавить все изменения" })
 
 -- 📑 Навигация по изменениям
 map("n", "]c", "]c", { desc = "➡ Следующий hunk (diff)" })
