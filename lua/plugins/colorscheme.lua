@@ -1,57 +1,56 @@
 return {
   {
-    "dgox16/oldworld.nvim",
+    "olimorris/onedarkpro.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      require("oldworld").setup({
-        terminal_colors = true, -- включить терминальные цвета
-        variant = "default",    -- варианты: "default", "oled", "cooler"
+      require("onedarkpro").setup({
+        -- Тема по умолчанию (можно выбрать: "onedark", "onelight", "onedark_vivid", "onedark_dark", "vaporwave")
+        colors = {},
+        highlights = {},
         styles = {
-          comments = {},        -- стили для комментариев
-          keywords = {},        -- стили для ключевых слов
-          identifiers = {},     -- стили для идентификаторов
-          functions = {},       -- стили для функций
-          variables = {},       -- стили для переменных
-          booleans = {},        -- стили для булевых значений
+          types = "NONE",
+          methods = "NONE",
+          numbers = "NONE",
+          strings = "NONE",
+          comments = "italic",
+          keywords = "bold,italic",
+          constants = "NONE",
+          functions = "italic",
+          operators = "NONE",
+          variables = "NONE",
+          parameters = "NONE",
+          conditionals = "italic",
+          virtual_text = "NONE",
         },
-        integrations = {
-          alpha = true,
-          cmp = true,
-          flash = true,
-          gitsigns = true,
-          hop = false,
-          indent_blankline = true,
-          lazy = true,
-          lsp = true,
-          markdown = true,
-          mason = true,
-          navic = false,
-          neo_tree = false,
-          neogit = false,
-          neorg = false,
-          noice = true,
-          notify = true,
-          rainbow_delimiters = true,
-          telescope = true,
-          treesitter = true,
+        filetypes = { all = true }, -- включить все подсветки для файлов
+        plugins = { all = true },   -- включить все интеграции
+        options = {
+          cursorline = true,        -- подсветка строки курсора
+          transparency = true,      -- прозрачный фон
+          terminal_colors = true,   -- цвета в встроенном терминале
+          highlight_inactive_windows = true,
         },
-        highlight_overrides = {},
       })
 
-      vim.cmd.colorscheme("oldworld")
+      vim.cmd("colorscheme onedark")
     end,
   },
 
-  -- lualine с автоматической подстройкой под тему
+  -- Lualine — авто тема
   {
     "nvim-lualine/lualine.nvim",
-    opts = { options = { theme = "auto", globalstatus = true } },
+    opts = {
+      options = {
+        theme = "auto",
+        globalstatus = true,
+      },
+    },
   },
 
-  -- Указать LazyVim, что используется oldworld
+  -- Указываем LazyVim, что тема — onedark
   {
     "LazyVim/LazyVim",
-    opts = { colorscheme = "oldworld" },
+    opts = { colorscheme = "onedark" },
   },
 }
