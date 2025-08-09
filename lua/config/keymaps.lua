@@ -3,7 +3,6 @@
 -- Add any additional keymaps here
 -- Открыть полное сравнение всех изменений
 local map = vim.keymap.set
-local opts = { noremap = true, silent = true }
 
 local function create_popup(lines)
   local buf = vim.api.nvim_create_buf(false, true)
