@@ -126,6 +126,30 @@ vim.keymap.set("n", "<leader>ga", function()
   })
 end, { desc = "➕ Добавить все изменения" })
 
+vim.keymap.set("n", "<leader>gu", function()
+  local buf = create_popup({ "git restore --staged .", "", "" })
+  local spin = start_spinner(buf, 2)
+  local output = {}
+
+  vim.fn.jobstart({ "git", "restore", "--staged", "." }, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      collect_output(output, data)
+    end,
+    on_stderr = function(_, data)
+      collect_output(output, data)
+    end,
+    on_exit = function()
+      spin.stop()
+      local lines = { "git restore --staged .:" }
+      vim.list_extend(lines, output)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    end,
+  })
+end, { desc = "🧹 Unstage all (restore --staged .)" })
+
+
 -- 📑 Навигация по изменениям
 map("n", "]c", "]c", { desc = "➡ Следующий hunk (diff)" })
 map("n", "[c", "[c", { desc = "⬅ Предыдущий hunk (diff)" })

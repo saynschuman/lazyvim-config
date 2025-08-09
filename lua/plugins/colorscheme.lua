@@ -1,19 +1,8 @@
 return {
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    lazy = false,
-    priority = 3000,
-    config = function()
-      require("catppuccin").setup({
-        float = {
-          transparent = true,
-          solid = false,
-        },
-        flavour = "mocha", -- latte, frappe, macchiato, mocha
-        transparent_background = true,
-      })
-      vim.cmd.colorscheme("catppuccin")
-    end,
-  },
+  "briones-gabriel/darcula-solid.nvim",
+  dependencies = { "rktjmp/lush.nvim", "nvim-treesitter/nvim-treesitter" },
+  config = function()
+    vim.cmd.colorscheme("darcula-solid-custom")
+    vim.cmd("set termguicolors")
+  end
 }
