@@ -326,3 +326,6 @@ end, {})
 
 vim.keymap.set("n", "gn", "<cmd>SmartBranch<cr>", { desc = "Smart Branch (Create/Switch)" })
 vim.keymap.set("n", "ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorizer Attach" })
+
+-- open file_browser with the path of the current buffer
+vim.keymap.set("n", "<space>fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
