@@ -78,27 +78,28 @@ map(
   { desc = "📁 Показать/скрыть панель файлов" }
 )
 map("n", "gf", "<cmd>DiffviewFocusFiles<CR>", { desc = "🔎 Фокус на панель файлов" })
-vim.keymap.set("n", "<leader>gr", function()
-  local buf = create_popup({ "git reset --hard HEAD", "", "" })
-  local spin = start_spinner(buf, 2)
-  local reset_output = {}
-  vim.fn.jobstart({ "git", "reset", "--hard", "HEAD" }, {
-    stdout_buffered = true,
-    stderr_buffered = true,
-    on_stdout = function(_, data)
-      collect_output(reset_output, data)
-    end,
-    on_stderr = function(_, data)
-      collect_output(reset_output, data)
-    end,
-    on_exit = function()
-      spin.stop()
-      local lines = { "git reset --hard HEAD:" }
-      vim.list_extend(lines, reset_output)
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-    end,
-  })
-end, { desc = "♻️ Сбросить все изменения" })
+
+-- vim.keymap.set("n", "<leader>gr", function()
+--   local buf = create_popup({ "git reset --hard HEAD", "", "" })
+--   local spin = start_spinner(buf, 2)
+--   local reset_output = {}
+--   vim.fn.jobstart({ "git", "reset", "--hard", "HEAD" }, {
+--     stdout_buffered = true,
+--     stderr_buffered = true,
+--     on_stdout = function(_, data)
+--       collect_output(reset_output, data)
+--     end,
+--     on_stderr = function(_, data)
+--       collect_output(reset_output, data)
+--     end,
+--     on_exit = function()
+--       spin.stop()
+--       local lines = { "git reset --hard HEAD:" }
+--       vim.list_extend(lines, reset_output)
+--       vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+--     end,
+--   })
+-- end, { desc = "♻️ Сбросить все изменения" })
 
 -- 📑 Навигация по изменениям
 map("n", "]c", "]c", { desc = "➡ Следующий hunk (diff)" })
