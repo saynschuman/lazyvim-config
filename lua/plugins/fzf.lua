@@ -114,7 +114,7 @@ return {
       -- Поиск и замена прямо из Telescope (ripgrep + quickfix + :cdo)
       local function grep_and_replace()
         -- Буквальный поиск (чтобы символы вроде { } не ломали запрос) и исключение каталогов
-        local default_args = "--fixed-strings -g !**/dist/** -g !**/node_modules/** -g !**/client-widgets/** "
+        local default_args = "-g !**/dist/** -g !**/node_modules/** -g !**/client-widgets/** "
         lga.live_grep_args({
           default_text = default_args,
           attach_mappings = function(prompt_bufnr, map)
@@ -159,12 +159,20 @@ return {
         { "<leader>ff", function() builtin.find_files({ hidden = true }) end, desc = "Поиск файлов (в т.ч. скрытые)" },
         { "<leader>fF", function() builtin.find_files({ hidden = true, no_ignore = true }) end, desc = "Файлы (игнор отключен)" },
         { "<leader>fo", builtin.oldfiles, desc = "Недавние файлы" },
-        { "<leader>fb", builtin.buffers, desc = "Открытые буферы" },
+        { "<leader>fb", builtin.buffers, desc = "Открытые буферы 📖" },
 
         -- Текстовый поиск (ripgrep) с интерактивными -g
-        { "<leader>sg", function() lga.live_grep_args() end, desc = "Глобальный поиск (интерактивные -g фильтры)" },
-        { "<leader>sG", function() lga.live_grep_args({ default_text =
-          "-g !**/node_modules/** -g !**/dist/** -g !**/client-widgets/** " }) end, desc = "Греп (исключая node_modules, dist, client-widgets)" },
+        { "<leader>gt", function() lga.live_grep_args() end, desc = "Глобальный поиск (интерактивные -g фильтры)" },
+        {
+          "<leader>gT",
+          function()
+            lga.live_grep_args({
+              default_text =
+              "-g !**/node_modules/** -g !**/dist/** -g !**/client-widgets/** "
+            })
+          end,
+          desc = "Греп (исключая node_modules, dist, client-widgets)"
+        },
         { "<leader>sw", builtin.grep_string, desc = "Слово под курсором" },
         { "<leader>sb", builtin.current_buffer_fuzzy_find, desc = "Поиск в буфере" },
 
