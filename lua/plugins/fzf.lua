@@ -43,7 +43,20 @@ return {
 
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
         sorting_strategy = "ascending",
-        layout_config = { prompt_position = "top" },
+        layout_strategy = "horizontal",
+        layout_config = {
+          -- Используем функции, чтобы вернуть ЦЕЛЫЕ числа (требование plenary.popup)
+          width = function(_, max_columns, _)
+            return math.floor(max_columns) -- 100% ширины
+          end,
+          height = function(_, _, max_lines)
+            return math.floor(max_lines) -- 100% высоты
+          end,
+          preview_width = function(_, cols)
+            return math.floor(cols * 0.65) -- preview ~65% ширины
+          end,
+          prompt_position = "top",
+        },
         file_ignore_patterns = {
           ".git/",
           "node_modules/",
@@ -52,6 +65,25 @@ return {
           "target/",
           "venv/",
           "%.lock$",
+        },
+      })
+
+      -- Маппинги для навигации C-j/C-k в окне Telescope
+      local actions = require("telescope.actions")
+      opts.defaults.mappings = vim.tbl_deep_extend("force", opts.defaults.mappings or {}, {
+        i = {
+          ["<C-j>"] = actions.move_selection_next,     -- вниз по списку
+          ["<C-k>"] = actions.move_selection_previous, -- вверх по списку
+          -- Вставка из системного буфера обмена в строку поиска Telescope
+          ["<C-v>"] = function()
+            -- Эквивалент <C-r>+ в insert-режиме
+            local keys = vim.api.nvim_replace_termcodes("<C-r>+", true, false, true)
+            vim.api.nvim_feedkeys(keys, "i", false)
+          end,
+        },
+        n = {
+          ["<C-j>"] = actions.move_selection_next,
+          ["<C-k>"] = actions.move_selection_previous,
         },
       })
 
@@ -89,7 +121,16 @@ return {
         { "<leader>fb", builtin.buffers, desc = "Открытые буферы" },
         -- Заменяем обычный live_grep на live_grep_args, чтобы можно было интерактивно задавать -g фильтры
         { "<leader>sg", function() lga.live_grep_args() end, desc = "Глобальный поиск (интерактивные -g фильтры)" },
-        { "<leader>sG", function() lga.live_grep_args({ default_text = "-g !**/node_modules/** -g !**/dist/** " }) end, desc = "Греп (исключая node_modules и dist)" },
+        {
+          "<leader>sG",
+          function()
+            lga.live_grep_args({
+              default_text =
+              "-g !**/node_modules/** -g !**/dist/** -g !**/client-widgets/** "
+            })
+          end,
+          desc = "Греп (исключая node_modules, dist и client-widgets)"
+        },
         { "<leader>sw", builtin.grep_string, desc = "Слово под курсором" },
         { "<leader>sb", builtin.current_buffer_fuzzy_find, desc = "Поиск в буфере" },
         { "<leader>gs", builtin.git_status, desc = "Git статус" },
