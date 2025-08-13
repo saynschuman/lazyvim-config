@@ -4,6 +4,10 @@ return {
   config = function()
     local fb_actions = require("telescope").extensions.file_browser.actions
     local actions = require("telescope.actions")
+    local function toggle_ignored_and_hidden(prompt_bufnr)
+      fb_actions.toggle_hidden(prompt_bufnr)            -- .*, например .env
+      fb_actions.toggle_respect_gitignore(prompt_bufnr) -- файлы из .gitignore
+    end
 
     require("telescope").setup {
       extensions = {
@@ -17,6 +21,7 @@ return {
               ["<A-m>"] = fb_actions.move,
               ["<A-y>"] = fb_actions.copy,
               ["<A-d>"] = fb_actions.remove,
+              ["<C-i>"] = toggle_ignored_and_hidden,
             },
             ["n"] = {
               ["<C-j>"] = actions.move_selection_next,
@@ -26,6 +31,7 @@ return {
               ["m"] = fb_actions.move,
               ["y"] = fb_actions.copy,
               ["d"] = fb_actions.remove,
+              ["<C-i>"] = toggle_ignored_and_hidden,
             },
           },
         },
