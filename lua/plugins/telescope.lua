@@ -30,23 +30,5 @@ return {
   end,
   keys = {
     { "ga", function() require("telescope.builtin").git_status() end, desc = "Git add" },
-    {
-      "<leader>gC",
-      function()
-        vim.ui.input({ prompt = "Commit message: " }, function(input)
-          if not input or input == "" then
-            vim.notify("Commit aborted", vim.log.levels.WARN)
-            return
-          end
-          vim.fn.system({ "git", "commit", "-m", input })
-          if vim.v.shell_error ~= 0 then
-            vim.notify("Commit failed", vim.log.levels.ERROR)
-          else
-            vim.notify("Committed", vim.log.levels.INFO)
-          end
-        end)
-      end,
-      desc = "Git commit",
-    },
   },
 }
