@@ -201,7 +201,7 @@ return {
         { "<leader>sb", builtin.current_buffer_fuzzy_find, desc = "Поиск в буфере" },
 
         { "<leader>gs", builtin.git_status, desc = "Git статус" },
-        { "<leader>gb", builtin.git_branches, desc = "Git ветки" },
+        -- { "<leader>gb", builtin.git_branches, desc = "Git ветки" },
         { "<leader>gc", builtin.git_commits, desc = "Git коммиты" },
         { "<leader>gC", builtin.git_bcommits, desc = "Git коммиты файла" },
 
