@@ -331,3 +331,4 @@ vim.keymap.set("n", "ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorize
 -- open file_browser with the path of the current buffer
 vim.keymap.set("n", "<space>fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
 vim.keymap.set("n", "<space>m", ":MarkdownPreviewToggle<CR>")
+vim.keymap.set("n", "<C-m>", ":Maximize<CR>")
