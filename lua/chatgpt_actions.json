@@ -1,0 +1,93 @@
+{
+  "grammar_correction": {
+    "type": "chat",
+    "opts": {
+      "title": "Grammar Correction (RU)",
+      "strategy": "display",
+      "template": "Исправь грамматические ошибки в следующем тексте и ответь на русском: {{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    }
+  },
+  "translate": {
+    "type": "chat",
+    "opts": {
+      "title": "Translate to Russian",
+      "strategy": "display",
+      "template": "Переведи следующий текст на русский язык: {{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    }
+  },
+  "summarize": {
+    "type": "chat",
+    "opts": {
+      "title": "Summarize (RU)",
+      "strategy": "display",
+      "template": "Сделай краткое содержание следующего текста на русском языке: {{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    }
+  },
+  "fix_bugs": {
+    "type": "chat",
+    "opts": {
+      "title": "Fix Bugs (RU)",
+      "strategy": "replace",
+      "template": "Найди и исправь ошибки в следующем коде, комментарии и пояснения дай на русском: {{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    }
+  },
+  "explain_code": {
+    "type": "chat",
+    "opts": {
+      "title": "Explain Code (RU)",
+      "strategy": "display",
+      "template": "Объясни следующий код на русском языке: {{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    }
+  },
+  "ask_display": {
+    "type": "chat",
+    "opts": {
+      "title": "Ask (RU)",
+      "strategy": "display",
+      "template": "Ответь на русском. Задание: {{argument}}\n\nВыбранный текст:\n{{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    },
+    "args": {
+      "argument": {
+        "type": "string",
+        "optional": "false",
+        "description": "Ваш запрос"
+      }
+    }
+  },
+  "ask_replace": {
+    "type": "chat",
+    "opts": {
+      "title": "Ask & Replace (RU)",
+      "strategy": "replace",
+      "template": "Преобразуй выделенный фрагмент согласно заданию. Отвечай на русском. Задание: {{argument}}\n\nТекст:\n{{input}}",
+      "params": {
+        "model": "gpt-4o"
+      }
+    },
+    "args": {
+      "argument": {
+        "type": "string",
+        "optional": "false",
+        "description": "Что сделать с текстом"
+      }
+    }
+  }
+}
