@@ -323,3 +323,4 @@ vim.keymap.set("n", "ca", "<cmd>ColorizerAttachToBuffer<cr>", { desc = "Colorize
 vim.keymap.set("n", "<space>fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
 vim.keymap.set("n", "<space>m", ":MarkdownPreviewToggle<CR>")
 vim.keymap.set("n", "<C-b>", "<C-b>", { noremap = true, silent = true })
+vim.keymap.set("n", "<space>h", "<cmd>noh<CR>", { noremap = true, silent = true })
