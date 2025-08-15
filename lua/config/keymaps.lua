@@ -283,14 +283,6 @@ vim.keymap.set("n", "<C-b>", function()
 
   table.sort(clean)
 
-  vim.ui.select(clean, { prompt = "Скопировать ветку:" }, function(choice)
-    if choice then
-      vim.fn.setreg("+", choice)
-      vim.notify("📋 Ветка скопирована: " .. choice, vim.log.levels.INFO)
-    else
-      vim.notify("Операция отменена", vim.log.levels.INFO)
-    end
-  end)
 end, { desc = "🌿 Показать ветки" })
 
 vim.keymap.set("n", "<leader>y", function()
