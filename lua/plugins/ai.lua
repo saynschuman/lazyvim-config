@@ -23,10 +23,10 @@ return {
         title = "Prompt",
         border = { style = "rounded" },
       },
-      sessions_window = {
-        border = { style = "rounded", title = "Sessions" },
-      },
-      sessions_dir = vim.fn.stdpath("data") .. "/chatgpt_sessions", -- папка для истории
+      -- sessions_window = {
+      --   border = { style = "rounded", title = "Sessions" },
+      -- },
+      -- sessions_dir = vim.fn.stdpath("data") .. "/chatgpt_sessions", -- папка для истории
     })
   end,
   dependencies = {
