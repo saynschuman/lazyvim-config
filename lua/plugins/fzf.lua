@@ -29,7 +29,7 @@ return {
       opts.defaults.layout_config        = {
         width = function(_, cols) return math.floor(cols) end,
         height = function(_, _, lines) return math.floor(lines) end,
-        preview_width = function(_, cols) return math.floor(cols * 0.65) end,
+        preview_width = function(_, cols) return math.floor(cols * 0.55) end,
         prompt_position = "top",
       }
 
