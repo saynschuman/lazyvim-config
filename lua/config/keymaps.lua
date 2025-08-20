@@ -324,3 +324,4 @@ vim.keymap.set("n", "<space>fb", ":Telescope file_browser path=%:p:h select_buff
 vim.keymap.set("n", "<space>m", ":MarkdownPreviewToggle<CR>")
 vim.keymap.set("n", "<C-b>", "<C-b>", { noremap = true, silent = true })
 vim.keymap.set("n", "<space>h", "<cmd>noh<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<space>w", "<cmd>:w<CR>", { noremap = true, silent = true })
