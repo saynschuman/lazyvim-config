@@ -11,4 +11,4 @@ vim.o.statusline =
     .. "%=%#SLPos#%l:%c"
 
 -- курсор всегда подчёркивание
-vim.o.guicursor = "n-v-c-sm:hor20,i-ci-ve:hor20,r-cr-o:hor20"
+vim.o.guicursor = "n-v-c-sm:hor20,i-ci-ve:ver2,r-cr-o:hor20"

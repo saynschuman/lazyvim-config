@@ -153,7 +153,7 @@ return {
       local function esc_replacement(s) return s:gsub("\\", "\\\\"):gsub("&", "\\&"):gsub("#", "\\#") end
 
       local function grep_and_replace()
-        local default_args = "-g !**/dist/** -g !**/node_modules/** -g !**/client-widgets/** "
+        local default_args = "-g !**/dist/** -g !**/node_modules/** -g !**/client-widgets/** -g !**/frontend/** "
         lga.live_grep_args({
           default_text = default_args,
           attach_mappings = function(prompt_bufnr, map)
@@ -193,7 +193,10 @@ return {
         {
           "<leader>gT",
           function()
-            lga.live_grep_args({ default_text = "-g !**/node_modules/** -g !**/dist/** -g !**/client-widgets/** " })
+            lga.live_grep_args({
+              default_text =
+              "-g !**/node_modules/** -g !**/dist/** -g !**/client-widgets/** -g !**/frontend/** "
+            })
           end,
           desc = "Греп (исключая node_modules, dist, client-widgets)"
         },
