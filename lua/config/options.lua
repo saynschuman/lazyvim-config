@@ -9,3 +9,6 @@ vim.cmd([[
 vim.o.statusline =
     "%#GitBranch# %{system('git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d \"\\n\"')} "
     .. "%=%#SLPos#%l:%c"
+
+-- курсор всегда подчёркивание
+vim.o.guicursor = "n-v-c-sm:hor20,i-ci-ve:hor20,r-cr-o:hor20"
