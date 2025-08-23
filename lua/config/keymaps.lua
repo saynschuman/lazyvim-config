@@ -330,3 +330,27 @@ vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { noremap = true, s
 vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<S-Left>", "<cmd>BufferLineMovePrev<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<S-Right>", "<cmd>BufferLineMoveNext<CR>", { noremap = true, silent = true })
+
+--  копирование относительного пути к текущему файлус
+local map = vim.keymap.set
+
+-- Функция для копирования относительного пути
+local function copy_relative_path()
+  -- Находим package.json "выше" текущего файла
+  local package_json = vim.fn.findfile("package.json", ".;")
+  if package_json == "" then
+    vim.notify("package.json not found", vim.log.levels.ERROR)
+    return
+  end
+
+  local root = vim.fn.fnamemodify(package_json, ":h")         -- директория с package.json
+  local filepath = vim.fn.expand("%:p")                       -- абсолютный путь текущего файла
+  local relpath = vim.fn.fnamemodify(filepath, ":.:" .. root) -- путь относительно root
+
+  -- Копируем в системный буфер обмена
+  vim.fn.setreg("+", relpath)
+  vim.notify("Copied relative path: " .. relpath)
+end
+
+-- Например, на <leader>cp
+map("n", "<leader>cd", copy_relative_path, { desc = "Copy relative path (from package.json)" })
